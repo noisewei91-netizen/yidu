@@ -1,0 +1,1269 @@
+/* ================================================================
+ * style.css ——《已讀》的樣式（這部分交給你調整！）
+ *
+ * 版面像視覺小說：
+ *   插圖填滿整個螢幕，旁白和對話放在下方的半透明對話框。
+ *   開始聊天時，手機從右邊滑進來，對話框往左讓出位置。
+ *   手機直著拿時，會蓋上一層「請將手機橫放」的畫面。
+ *
+ * 所有尺寸都用 --u 當單位：1u ≈ 螢幕高度的 1%
+ * （螢幕比 16:9 還窄時，改用寬度換算，畫面才不會擠出去）。
+ * 例如 1920×1080 的螢幕，1u = 10.8px。
+ * ================================================================ */
+
+:root {
+  /* ---------- 顏色（整部作品固定是深夜配色） ---------- */
+  --night: #11152a;       /* 背景：深夜 */
+  --night-deep: #0a0d1c;  /* 轉場黑幕、封面還沒載好時的底色 */
+  --start-shade: #0a0d1cd9; /* 開始畫面右下角壓暗的程度（最後兩碼 d9 是透明度） */
+  --void: #000000;        /* 「請橫放」「戴上耳機」這兩個系統畫面 */
+  --chat-bg: #171d35;     /* 開發者面板的按鈕底色 */
+  --line: #2a3254;        /* 細框線 */
+  --paper: #ece4d2;       /* 旁白文字：暖白，像紙 */
+  --muted: #8f94ad;       /* 系統小字 */
+  --lamp: #f1c375;        /* 強調色：檯燈的光 */
+  --lamp-ink: #2b1d06;
+  --lamp-soft: #f1c3752e; /* 檯燈色的淡底 */
+  --notify-bg: #222a48;   /* 開發者面板底色 */
+  --shadow: #00000066;
+  --alert: #ffb4aa;
+  --alert-bg: #3b1d24;
+  --system-ink: #e9e9e9;  /* 系統畫面的白色細線和字 */
+
+  /* 對話框：想改成參考圖那種白色，換成 #f4f1ecdd 和 #2b2620 就好 */
+  --glass: #0a0d1cd1;     /* 對話框底色（最後兩碼 d1 是透明度） */
+  --glass-ink: var(--paper);
+  --glass-line: #ffffff1f;
+  --dim: #00000099;       /* 手機出現時，插圖右邊變暗的程度 */
+  --curtain-black: #000000; /* 黑幕 */
+  --curtain-white: #ffffff; /* 白幕 */
+  --place-bg: #000000d9;    /* 地點字條的黑底（最後兩碼 d9 是透明度） */
+  --place-ink: #ffffff;
+  --place-sub: #ffffffa6;   /* 地點字條下面的小字 */
+
+  /* ---------- 手機（淺色，像拿在手上的真手機） ---------- */
+  --phone-shell: #f6eedf;    /* 外框：奶油色 */
+  --phone-edge: #cdbfa6;     /* 外框最外圈的細線、側邊按鍵 */
+  --phone-ring: #2c3456;     /* 螢幕外圈和瀏海：深藍 */
+  --phone-lens: #48517a;     /* 瀏海上的鏡頭 */
+  --phone-bar: #fdf4f7;      /* 狀態列、標題列 */
+  --phone-ink: #2c3566;      /* 手機裡的字和圖示 */
+  --phone-ink-soft: #8d95b6; /* 輸入列的圖示、提示字 */
+  --phone-line: #2c35661f;   /* 細線、泡泡的陰影 */
+  --phone-field: #eef1f8;    /* 輸入框 */
+  --phone-battery: #86d968;  /* 電量 */
+  --phone-notify: #fffffff2; /* 通知橫幅 */
+  --mine: #d5f8f7;           /* 你的泡泡：淺藍綠 */
+  --theirs: #ffffff;         /* 別人的泡泡 */
+  --wall-ink: #3b4373;       /* 直接寫在桌布上的小字（名字、已讀） */
+  --wall-glow: 0 0 3px #ffffffcc;
+  --wall-chip: #2c356673;    /* 桌布上的日期、收回訊息：深色半透明底配白字 */
+  --wall-chip-ink: #ffffff;
+  /* 聊天室的桌布：模糊的暖色光斑。想換成自己的圖，改成 url("img/wallpaper.jpg") center / cover */
+  --wallpaper:
+    radial-gradient(circle at 20% 18%, #ffe2ae, transparent 38%),
+    radial-gradient(circle at 86% 52%, #ee8f8f, transparent 40%),
+    radial-gradient(circle at 28% 82%, #f2a25e, transparent 42%),
+    linear-gradient(165deg, #f8cd98, #f1a780 55%, #d68f9e);
+
+  /* ---------- 字體：旁白用明體，介面用黑體 ---------- */
+  --font-story: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-ui: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-code: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---------- 單位 ---------- */
+  --u: min(1vh, 0.5625vw);
+
+  /* ---------- 字級（想調大小改這裡；max 前面是最小值，手機橫放時才看得清楚） ---------- */
+  --fs-caption: max(14px, calc(var(--u) * 2.6)); /* 對話框裡的字 */
+  --fs-who: max(12px, calc(var(--u) * 1.7));     /* 說話者名牌 */
+  --fs-chat: max(12px, calc(var(--u) * 2.2));    /* 聊天訊息 */
+  --fs-small: max(10px, calc(var(--u) * 1.45));  /* 名字、已讀、時鐘 */
+  --fs-title: max(13px, calc(var(--u) * 2.3));   /* 聊天室名稱 */
+  --fs-choice: max(13px, calc(var(--u) * 1.95)); /* 選項 */
+  --fs-prompt: max(12px, calc(var(--u) * 1.7));  /* 選項上方的提示 */
+  --fs-card: max(20px, calc(var(--u) * 4.2));    /* 轉場大字 */
+  --fs-lead: max(13px, calc(var(--u) * 2.3));    /* 按鈕、轉場和結局卡的副標 */
+  --fs-sticker: max(30px, calc(var(--u) * 5.6)); /* 貼圖 */
+  --fs-ph: max(11px, calc(var(--u) * 1.75));     /* 插圖還沒放時的說明 */
+  --fs-place: max(15px, calc(var(--u) * 2.8));   /* 地點字條 */
+  --fs-place-sub: max(11px, calc(var(--u) * 1.7)); /* 地點字條下面的小字 */
+
+  /* ---------- 版面位置 ---------- */
+  --edge: calc(var(--u) * 6);       /* 手機上下的留白 */
+  --side: calc(var(--u) * 7);       /* 左右的留白 */
+  --box-w: calc(var(--u) * 124);    /* 對話框寬度（手機收起來時） */
+  --phone-w: calc(var(--u) * 54);   /* 手機寬度 */
+  --phone-sink: calc(var(--u) * 8); /* 手機下緣超出畫面多少 */
+  --bezel-w: calc(var(--u) * 1.8);  /* 手機外框（奶油色）粗細 */
+  --ring-w: calc(var(--u) * 0.7);   /* 螢幕外圈（深藍）粗細 */
+  --screen-r: calc(var(--u) * 5.4); /* 手機螢幕圓角 */
+  --icon: max(14px, calc(var(--u) * 2.8)); /* 手機裡的圖示 */
+  --avatar: max(22px, calc(var(--u) * 4)); /* 聊天頭像大小 */
+  /* iPhone 橫放時，瀏海和底部橫條的安全距離 */
+  --side-l: max(var(--side), env(safe-area-inset-left, 0px));
+  --side-r: max(var(--side), env(safe-area-inset-right, 0px));
+  --top: calc(var(--edge) + env(safe-area-inset-top, 0px));
+  --bottom: calc(var(--edge) + env(safe-area-inset-bottom, 0px));
+  --box-bottom: calc(var(--u) * 4 + env(safe-area-inset-bottom, 0px));
+
+  color-scheme: dark;
+  box-sizing: border-box;
+}
+/* 手機瀏覽器的網址列會伸縮，支援的話改用「實際看得到的高度」 */
+@supports (height: 1dvh) {
+  :root { --u: min(1dvh, 0.5625dvw); }
+}
+/* 手機橫放（螢幕很矮）時：手機畫面加寬、留白縮小 */
+@media (max-height: 520px) {
+  :root {
+    --edge: calc(var(--u) * 4);
+    --side: calc(var(--u) * 5);
+    --phone-w: calc(var(--u) * 70);
+    --box-w: calc(var(--u) * 150);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--paper);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ================================================================
+ * 整個作品：蓋滿螢幕
+ * ================================================================ */
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* 長按時不要跳出 iPhone 的選單 */
+  -webkit-tap-highlight-color: transparent;
+}
+#app.waiting { cursor: pointer; }
+#story { position: absolute; inset: 0; }
+
+/* ---------- 插圖：填滿整個螢幕 ---------- */
+#scene {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  background: var(--night);
+}
+#scene-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 螢幕比例不同時，裁掉邊緣，不留黑邊 */
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+#scene-img.loaded { opacity: 1; }
+/* 運鏡（zoomIn、zoomOut、pan）：放大、移動的是這一層，手機和對話框不會跟著動
+ * 秒數由 engine.js 照 ms 設定；想換一種加速減速的感覺，改 ease-in-out（例如 linear 是等速） */
+#camera {
+  position: absolute;
+  inset: 0;
+  transition: transform 3s ease-in-out, transform-origin 3s ease-in-out;
+}
+/* 手機出現時，插圖右邊慢慢變暗，讓視線集中到手機 */
+#scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, var(--dim), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  pointer-events: none;
+}
+.phone-on #scene::after { opacity: 1; }
+/* 揉完眼睛、重新對焦：engine.js 會等這個動畫播完才繼續 */
+#scene.refocus { animation: refocus 3.1s ease-in-out; }
+
+/* 插圖還沒放進資料夾時：顯示編號和說明 */
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 1);
+  padding: var(--top) var(--side-r) calc(var(--u) * 28) var(--side-l);
+  color: var(--muted);
+  font-size: var(--fs-ph);
+  line-height: 1.5;
+  text-align: center;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 calc(var(--u) * 3), #ffffff05 calc(var(--u) * 3) calc(var(--u) * 6)),
+    var(--night);
+}
+.placeholder b {
+  font-family: var(--font-code);
+  font-size: calc(var(--fs-ph) * 1.6);
+  letter-spacing: 0.08em;
+  color: var(--paper);
+}
+
+/* ---------- 對話框 ---------- */
+#caption {
+  position: absolute;
+  z-index: 4; /* 在黑幕、白幕上面：黑幕上也能放旁白 */
+  bottom: var(--box-bottom);
+  /* 手機收起來時：置中 */
+  left: max(var(--side-l), 50% - var(--box-w) / 2);
+  right: max(var(--side-r), 50% - var(--box-w) / 2);
+  min-height: calc(var(--fs-caption) * 1.75 * 2 + var(--u) * 6.8);
+  padding: calc(var(--u) * 3.4) calc(var(--u) * 4.4);
+  border: 1px solid var(--glass-line);
+  border-radius: calc(var(--u) * 2);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--glass-ink);
+  font-family: var(--font-story);
+  font-size: var(--fs-caption);
+  line-height: 1.75;
+  transition: left 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), right 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.3s ease, visibility 0.3s;
+}
+/* 手機出現時：對話框往左縮，讓出手機的位置 */
+.phone-on #caption {
+  left: var(--side-l);
+  right: calc(var(--side-r) + var(--phone-w) + var(--u) * 4);
+}
+/* 沒有文字時，對話框淡出 */
+#caption.empty { opacity: 0; visibility: hidden; }
+
+/* 說話者名牌：貼在對話框左上角 */
+#caption-who {
+  position: absolute;
+  top: 0;
+  left: calc(var(--u) * 3.2);
+  transform: translateY(-55%);
+  padding: calc(var(--u) * 0.5) calc(var(--u) * 2.6);
+  border-radius: 999px;
+  background: var(--lamp);
+  color: var(--lamp-ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-who);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+}
+#caption-text {
+  margin: 0;
+  max-width: 40em;
+  text-wrap: pretty;
+}
+/* 字一個一個出來：每個字先放好但看不見，輪到它時很快地淡入 */
+#caption-text span { opacity: 0; transition: opacity 0.12s ease; }
+#caption-text span.on { opacity: 1; }
+/* 等讀者點擊時，對話框右下角出現閃動的 ▾ */
+.waiting #caption:not(.empty)::after {
+  content: "▾";
+  position: absolute;
+  right: calc(var(--u) * 2.6);
+  bottom: calc(var(--u) * 1.6);
+  color: var(--lamp);
+  font-family: var(--font-ui);
+  font-size: 0.8em;
+  animation: bob 1.2s ease-in-out infinite;
+}
+
+/* ---------- 手機 ---------- */
+/* 像拿在手上的真手機：奶油色外框、深藍的螢幕外圈和瀏海，下緣超出畫面 */
+#phone {
+  position: absolute;
+  z-index: 3;
+  top: var(--top);
+  bottom: calc(var(--phone-sink) * -1);
+  right: var(--side-r);
+  width: var(--phone-w);
+  padding: var(--bezel-w);
+  border-radius: calc(var(--screen-r) + var(--bezel-w));
+  background: var(--phone-shell);
+  box-shadow:
+    inset 0 0 0 calc(var(--u) * 0.3) #ffffff8c, /* 外框內側的反光 */
+    0 0 0 1px var(--phone-edge),
+    0 calc(var(--u) * 3) calc(var(--u) * 6) var(--shadow);
+  /* 收起來的樣子：在右邊外面、透明 */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(calc(var(--u) * 10));
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.6s ease, visibility 0.9s;
+}
+.phone-on #phone {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+/* 側邊按鍵：左邊兩個音量鍵，右邊一個電源鍵 */
+#phone::before,
+#phone::after {
+  content: "";
+  position: absolute;
+  width: calc(var(--u) * 0.7);
+  border-radius: calc(var(--u) * 0.35);
+  background: var(--phone-edge);
+}
+#phone::before {
+  left: calc(var(--u) * -0.5);
+  top: calc(var(--u) * 20);
+  height: calc(var(--u) * 6);
+  box-shadow: 0 calc(var(--u) * 8) 0 var(--phone-edge);
+}
+#phone::after {
+  right: calc(var(--u) * -0.5);
+  top: calc(var(--u) * 26);
+  height: calc(var(--u) * 9);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: var(--ring-w) solid var(--phone-ring);
+  border-radius: var(--screen-r);
+  overflow: hidden;
+  background: var(--wallpaper);
+  color: var(--phone-ink);
+}
+.screen svg {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.screen svg.solid { fill: currentColor; stroke: none; }
+
+/* 狀態列：時鐘、瀏海、訊號和電池 */
+.status {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: calc(var(--u) * 4.4);
+  padding: 0 calc(var(--u) * 3);
+  background: var(--phone-bar);
+  font-size: var(--fs-small);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* 瀏海：和螢幕外圈同色，看起來像從外框垂下來 */
+.notch {
+  position: relative;
+  align-self: start;
+  width: calc(var(--u) * 14);
+  height: calc(var(--u) * 3.1);
+  border-radius: 0 0 calc(var(--u) * 2) calc(var(--u) * 2);
+  background: var(--phone-ring);
+}
+.notch::after { /* 鏡頭 */
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 22%;
+  width: calc(var(--u) * 1.1);
+  height: calc(var(--u) * 1.1);
+  border-radius: 50%;
+  background: var(--phone-lens);
+  transform: translateY(-50%);
+}
+.status-icons {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 0.6);
+}
+.status-icons svg { width: calc(var(--u) * 1.8); height: calc(var(--u) * 1.8); }
+.battery {
+  position: relative;
+  width: calc(var(--u) * 3);
+  height: calc(var(--u) * 1.5);
+  margin-right: calc(var(--u) * 0.4);
+  border: calc(var(--u) * 0.18) solid currentColor;
+  border-radius: calc(var(--u) * 0.45);
+}
+.battery::before { /* 電量 61% */
+  content: "";
+  position: absolute;
+  inset: calc(var(--u) * 0.16);
+  right: 39%;
+  border-radius: calc(var(--u) * 0.2);
+  background: var(--phone-battery);
+}
+.battery::after { /* 電池頭 */
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(var(--u) * -0.55);
+  width: calc(var(--u) * 0.3);
+  height: 45%;
+  border-radius: 0 2px 2px 0;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+/* 標題列：返回、聊天室名稱、電話和選單 */
+#chat-bar {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, auto) 1fr;
+  align-items: center;
+  gap: calc(var(--u) * 1);
+  padding: calc(var(--u) * 0.6) calc(var(--u) * 2.2) calc(var(--u) * 1.4);
+  background: var(--phone-bar);
+  box-shadow: 0 1px 0 var(--phone-line);
+  font-size: var(--fs-title);
+  font-weight: 700;
+}
+#chat-bar .back { justify-self: start; display: flex; }
+#chat-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.bar-icons { justify-self: end; display: flex; gap: calc(var(--u) * 1.6); }
+
+#log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 0.8);
+  padding: calc(var(--u) * 1.8) calc(var(--u) * 1.8);
+}
+#log::-webkit-scrollbar { display: none; }
+
+.row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--u) * 0.35);
+  animation: pop 0.25s ease both;
+}
+.row.mine { align-items: flex-end; }
+/* 別人的訊息左邊留位置給頭像 */
+.row.theirs { padding-left: calc(var(--avatar) + var(--u) * 1); }
+/* 直接寫在桌布上的小字（名字、已讀）：深色字加一圈白光，淺色桌布上也看得清楚 */
+.who {
+  margin: calc(var(--u) * 0.7) 0 0 calc(var(--u) * 0.5);
+  font-size: var(--fs-small);
+  color: var(--wall-ink);
+  text-shadow: var(--wall-glow);
+}
+
+/* 聊天頭像：圓圈裡一個字（有設定 img 就顯示圖片） */
+.avatar {
+  position: absolute;
+  top: calc(var(--u) * 0.7);
+  left: 0;
+  width: var(--avatar);
+  height: var(--avatar);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--avatar-bg, var(--phone-ink-soft)) center / cover no-repeat;
+  box-shadow: 0 0 0 calc(var(--u) * 0.25) var(--theirs);
+  color: var(--paper);
+  font-size: var(--fs-small);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 自己的訊息：左邊是「已讀」和時間，右邊是泡泡 */
+.msg-line {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: calc(var(--u) * 0.7);
+}
+.receipt {
+  flex: none;
+  color: var(--wall-ink);
+  text-shadow: var(--wall-glow);
+  font-size: max(10px, calc(var(--u) * 1.3));
+  line-height: 1.3;
+  text-align: right;
+  white-space: pre-line;
+  font-variant-numeric: tabular-nums;
+}
+.receipt:empty { display: none; }
+/* 收回訊息之後，「已讀」還留著，變成深色小標籤，亮一下讓讀者注意到 */
+.receipt.linger {
+  padding: calc(var(--u) * 0.3) calc(var(--u) * 0.8);
+  border-radius: calc(var(--u) * 0.8);
+  background: var(--phone-ink);
+  color: var(--wall-chip-ink);
+  font-weight: 700;
+  text-shadow: none;
+  animation: linger 2.4s ease both;
+}
+.bubble {
+  max-width: 82%;
+  padding: calc(var(--u) * 1) calc(var(--u) * 1.8);
+  border-radius: calc(var(--u) * 2.6);
+  background: var(--theirs);
+  color: var(--phone-ink);
+  box-shadow: 0 calc(var(--u) * 0.2) calc(var(--u) * 0.6) var(--phone-line);
+  font-size: var(--fs-chat);
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.mine .bubble { background: var(--mine); }
+.sticker {
+  padding: 0 calc(var(--u) * 0.4);
+  font-size: var(--fs-sticker);
+  line-height: 1.1;
+}
+
+/* 照片訊息：圖檔還沒放時，顯示編號和說明 */
+.photo {
+  position: relative;
+  width: min(100%, calc(var(--phone-w) * 0.62));
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 0.4);
+  padding: calc(var(--u) * 1.2);
+  border-radius: calc(var(--u) * 1.6);
+  overflow: hidden;
+  background: var(--theirs);
+  box-shadow: 0 calc(var(--u) * 0.2) calc(var(--u) * 0.6) var(--phone-line);
+  color: var(--phone-ink-soft);
+  font-size: var(--fs-small);
+  line-height: 1.4;
+  text-align: center;
+}
+.photo b { font-family: var(--font-code); color: var(--phone-ink); }
+.photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.photo.loaded img { opacity: 1; }
+
+/* ---------- 收回訊息 ---------- */
+/* 等讀者按的那則訊息：隔一圈白色空隙的深色外框，再一閃一閃（關掉動畫時外框也看得到） */
+.bubble.pick {
+  cursor: pointer;
+  box-shadow: 0 0 0 2px var(--theirs), 0 0 0 4px var(--phone-ink);
+  animation: pick 1.4s ease-in-out infinite;
+}
+.bubble.vanish {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.mine .bubble.unsent,
+.bubble.unsent {
+  border: 1px dashed var(--wall-chip-ink);
+  background: var(--wall-chip);
+  box-shadow: none;
+  color: var(--wall-chip-ink);
+  font-size: var(--fs-small);
+  font-weight: 400;
+}
+/* 長按後跳出來的選單：複製、轉傳、收回 */
+.msg-menu {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: calc(100% + var(--u) * 0.6);
+  display: flex;
+  overflow: hidden;
+  border-radius: calc(var(--u) * 1.4);
+  background: var(--theirs);
+  box-shadow: 0 calc(var(--u) * 0.8) calc(var(--u) * 2.4) var(--shadow);
+  animation: pop 0.2s ease both;
+}
+.msg-menu button {
+  padding: calc(var(--u) * 1) calc(var(--u) * 1.8);
+  border: none;
+  background: none;
+  color: var(--phone-ink);
+  font: inherit;
+  font-size: var(--fs-chat);
+  cursor: pointer;
+}
+.msg-menu button + button { border-left: 1px solid var(--phone-line); }
+.msg-menu button:disabled { color: var(--phone-ink-soft); opacity: 0.6; cursor: default; }
+.msg-menu .take {
+  font-weight: 700;
+  animation: take 1.4s ease-in-out infinite;
+}
+.msg-menu .take:hover, .msg-menu .take:focus-visible { background: var(--mine); }
+.sys {
+  align-self: center;
+  margin: calc(var(--u) * 0.5) 0;
+  padding: calc(var(--u) * 0.25) calc(var(--u) * 1.2);
+  border-radius: 999px;
+  background: var(--wall-chip);
+  color: var(--wall-chip-ink);
+  font-size: var(--fs-small);
+}
+
+/* 正在輸入的三個點 */
+.typing {
+  display: flex;
+  gap: calc(var(--u) * 0.5);
+  padding: calc(var(--u) * 1.4) calc(var(--u) * 1.7);
+}
+.typing i {
+  width: calc(var(--u) * 0.7);
+  height: calc(var(--u) * 0.7);
+  border-radius: 50%;
+  background: var(--phone-ink-soft);
+  animation: blink 1.2s infinite;
+}
+.typing i:nth-child(2) { animation-delay: 0.2s; }
+.typing i:nth-child(3) { animation-delay: 0.4s; }
+
+/* 下方的輸入列（你的訊息會先打在這裡再送出）
+ * 手機下緣超出畫面，所以底下多留一段，按鈕才不會被切掉 */
+.inputbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 1.4);
+  padding: calc(var(--u) * 1.2) calc(var(--u) * 2)
+    calc(var(--phone-sink) - var(--bezel-w) - var(--ring-w) + var(--u) * 1.4 + env(safe-area-inset-bottom, 0px));
+  background: var(--theirs);
+  color: var(--phone-ink-soft);
+  font-size: var(--fs-chat);
+  line-height: 1.5;
+}
+.tools { display: flex; gap: calc(var(--u) * 1.4); }
+.field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 0.8);
+  padding: calc(var(--u) * 0.5) calc(var(--u) * 1.6);
+  border-radius: calc(var(--u) * 2.4);
+  background: var(--phone-field);
+}
+/* 字太多時換行，輸入框跟著長高，正在打的字才不會被切掉 */
+#draft { flex: 1; min-width: 0; color: var(--phone-ink); overflow-wrap: anywhere; }
+#draft:empty::before { content: "輸入訊息"; color: var(--phone-ink-soft); }
+.send { display: flex; }
+.send .to-send { display: none; color: var(--phone-ink); }
+/* 打字時：左邊的按鈕收起來讓輸入框變寬，麥克風變成送出 */
+.inputbar:has(#draft:not(:empty)) .tools,
+.inputbar:has(#draft:not(:empty)) .to-mic { display: none; }
+.inputbar:has(#draft:not(:empty)) .to-send { display: block; }
+/* 閃動的游標（caret）：輸入框空著時不顯示「輸入訊息」，只剩游標在閃 */
+.caret-on #draft::after {
+  content: "";
+  display: inline-block;
+  width: max(1.5px, calc(var(--u) * 0.22));
+  height: 1.15em;
+  margin-left: 1px;
+  vertical-align: -0.2em;
+  background: var(--phone-ink);
+  animation: caret 1.1s steps(1) infinite;
+}
+.caret-on #draft:empty::before { content: none; }
+
+/* 通知橫幅 */
+#notify {
+  position: absolute;
+  top: calc(var(--u) * 5.2);
+  left: calc(var(--u) * 1.4);
+  right: calc(var(--u) * 1.4);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 0.2);
+  padding: calc(var(--u) * 1.1) calc(var(--u) * 1.6);
+  border-radius: calc(var(--u) * 1.8);
+  background: var(--phone-notify);
+  box-shadow: 0 calc(var(--u) * 0.8) calc(var(--u) * 2.4) var(--shadow);
+  color: var(--phone-ink);
+  font-size: var(--fs-chat);
+  /* 收起來時往上移「自己的高度 + 上方距離」，字變兩行時也不會露出來 */
+  visibility: hidden;
+  transform: translateY(calc(-100% - var(--u) * 6));
+  transition: transform 0.35s ease, visibility 0.35s;
+}
+#notify.show { visibility: visible; transform: none; }
+#notify strong { font-size: var(--fs-small); font-weight: 700; color: var(--phone-ink-soft); }
+/* 手機收起來時：通知出現在畫面右上角 */
+#app > #notify {
+  z-index: 4;
+  top: var(--top);
+  left: auto;
+  right: var(--side-r);
+  width: min(calc(100% - var(--side-l) - var(--side-r)), calc(var(--phone-w) - var(--u) * 2.8));
+  opacity: 0;
+  transform: translateY(calc(var(--u) * -3));
+  transition: transform 0.35s ease, opacity 0.35s ease, visibility 0.35s;
+}
+#app > #notify.show { opacity: 1; transform: none; }
+
+/* 手機螢幕暗下去 */
+.screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: var(--void);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2.4s ease;
+}
+.screen-off .screen::after { opacity: 1; }
+
+/* ---------- 選項 ---------- */
+#choices {
+  position: absolute;
+  z-index: 4;
+  /* 手機收起來時：放在畫面中間、對話框上方 */
+  left: max(var(--side-l), 50% - var(--u) * 40);
+  right: max(var(--side-r), 50% - var(--u) * 40);
+  bottom: calc(var(--box-bottom) + var(--u) * 22);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 1.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(var(--u) * 1.2));
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+}
+/* 手機開著時：像鍵盤一樣從手機下方升起，蓋住輸入列 */
+.phone-on #choices {
+  left: auto;
+  right: calc(var(--side-r) + var(--bezel-w) + var(--ring-w));
+  width: calc(var(--phone-w) - (var(--bezel-w) + var(--ring-w)) * 2);
+  bottom: 0;
+  padding: calc(var(--u) * 2) calc(var(--u) * 2) calc(var(--u) * 2.4 + env(safe-area-inset-bottom, 0px));
+  border-radius: calc(var(--u) * 2.4) calc(var(--u) * 2.4) 0 0;
+  background: var(--phone-bar);
+  box-shadow: 0 calc(var(--u) * -0.6) calc(var(--u) * 2) var(--phone-line);
+}
+#choices.show { opacity: 1; visibility: visible; transform: none; }
+
+.prompt {
+  margin: 0 0 calc(var(--u) * 0.2);
+  font-family: var(--font-story);
+  font-size: var(--fs-prompt);
+  color: var(--paper);
+  text-shadow: 0 1px 6px var(--shadow);
+}
+.phone-on .prompt { color: var(--phone-ink-soft); text-shadow: none; }
+.choice {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--u) * 1.2);
+  padding: calc(var(--u) * 1.3) calc(var(--u) * 1.8);
+  border: 1px solid var(--lamp);
+  border-radius: calc(var(--u) * 1.6);
+  background: var(--glass);
+  color: var(--paper);
+  font: inherit;
+  font-size: var(--fs-choice);
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.choice:hover, .choice:active { background: var(--lamp-soft); }
+/* 選項前面的 1、2：提示可以按數字鍵 */
+.choice .key {
+  flex: none;
+  font-family: var(--font-code);
+  font-size: 0.8em;
+  color: var(--lamp);
+}
+/* 手機開著時：選項跟著換成手機的淺色 */
+.phone-on .choice {
+  border-color: var(--phone-line);
+  background: var(--theirs);
+  color: var(--phone-ink);
+}
+.phone-on .choice:hover, .phone-on .choice:active { background: var(--mine); }
+.phone-on .choice .key { color: var(--phone-ink-soft); }
+@media (pointer: coarse), (hover: none) {
+  .choice .key { display: none; }
+}
+
+button:focus-visible, select:focus-visible {
+  outline: 2px solid var(--lamp);
+  outline-offset: 2px;
+}
+
+/* ---------- 黑幕、白幕（fadeOut / fadeIn） ---------- */
+/* 蓋住插圖和手機；旁白、選項、地點字條、轉場大字和結局卡都在它上面 */
+#curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--curtain-black);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* 秒數由 engine.js 照 fadeOut / fadeIn 的 ms 設定 */
+  transition: opacity 1s ease, visibility 1s, background-color 1s ease;
+}
+#curtain.up { opacity: 1; visibility: visible; }
+#curtain.white { background: var(--curtain-white); }
+/* 停在幕後面換聊天室時：手機、對話框、插圖右邊的暗影都直接到位，不播動畫 */
+.instant #phone,
+.instant #caption,
+.instant #scene::after,
+.instant .screen::after { transition: none; }
+
+/* ---------- 地點字條：黑底白字，從左上角滑進來（place） ---------- */
+#place {
+  position: absolute;
+  z-index: 4;
+  top: var(--top);
+  left: 0;
+  max-width: 55%;
+  padding: calc(var(--u) * 1.5) calc(var(--u) * 5) calc(var(--u) * 1.5) var(--side-l);
+  background: var(--place-bg);
+  color: var(--place-ink);
+  font-family: var(--font-story);
+  line-height: 1.4;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(calc(var(--u) * -4));
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0.6s;
+  pointer-events: none;
+}
+#place.show { opacity: 1; visibility: visible; transform: none; }
+#place-text { margin: 0; font-size: var(--fs-place); letter-spacing: 0.14em; }
+#place-sub {
+  margin: calc(var(--u) * 0.3) 0 0;
+  color: var(--place-sub);
+  font-size: var(--fs-place-sub);
+  letter-spacing: 0.1em;
+}
+
+/* ---------- 轉場黑幕 ---------- */
+#card {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 3);
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: var(--night-deep);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+#card.show { opacity: 1; visibility: visible; }
+#card-text {
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: var(--fs-card);
+  letter-spacing: 0.3em;
+  text-align: center;
+}
+#card-sub {
+  margin: calc(var(--u) * -1.4) 0 0;
+  font-family: var(--font-story);
+  font-size: var(--fs-lead);
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-align: center;
+}
+.card-hint {
+  font-size: var(--fs-small);
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.waiting #card .card-hint { opacity: 1; }
+
+/* ---------- 結局卡 ---------- */
+#ending {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-y: auto;
+  background: var(--night-deep);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease, visibility 0.8s;
+}
+#ending.show { opacity: 1; visibility: visible; }
+.ending-inner {
+  width: min(100%, calc(var(--u) * 90));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 2.4);
+  text-align: center;
+}
+#ending-no {
+  margin: 0;
+  font-size: var(--fs-lead);
+  letter-spacing: 0.4em;
+  color: var(--lamp);
+}
+#ending-title {
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: calc(var(--fs-card) * 1.4);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+}
+/* 標題下面的一句話 */
+#ending-tagline {
+  margin: calc(var(--u) * -0.6) 0 0;
+  font-family: var(--font-story);
+  font-size: var(--fs-lead);
+  letter-spacing: 0.12em;
+}
+/* 三行結果：名字（檯燈色）對齊在左邊，結果接在後面 */
+#ending-results {
+  margin: calc(var(--u) * 1.2) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 0.9);
+  font-size: var(--fs-choice);
+  line-height: 1.6;
+  text-align: left;
+}
+#ending-results li { display: flex; gap: 1.2em; }
+#ending-results b {
+  flex: none;
+  min-width: 2.4em;
+  color: var(--lamp);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+/* 最後那句話：上面一小段細線隔開 */
+#ending-quote {
+  margin: calc(var(--u) * 1) 0 0;
+  font-family: var(--font-story);
+  font-size: var(--fs-lead);
+  line-height: 1.7;
+  letter-spacing: 0.1em;
+  color: var(--lamp);
+  text-wrap: balance;
+}
+#ending-quote::before {
+  content: "";
+  display: block;
+  width: calc(var(--u) * 6);
+  height: 1px;
+  margin: 0 auto calc(var(--u) * 2.2);
+  background: var(--line);
+}
+/* 四個結局：看過的顯示名字，沒看過的是 ？？？ */
+#ending-list {
+  margin: calc(var(--u) * 1.6) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--u) * 1);
+  font-size: var(--fs-small);
+}
+#ending-list li {
+  display: flex;
+  gap: 0.8em;
+  padding: calc(var(--u) * 0.8) calc(var(--u) * 1.8);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+}
+#ending-list li.seen { color: var(--paper); }
+#ending-list li.now { border-color: var(--lamp); color: var(--lamp); }
+#ending-list .no { opacity: 0.7; }
+#ending-unlock { margin: 0; font-size: var(--fs-small); color: var(--muted); }
+.ending-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--u) * 1.6);
+  margin-top: calc(var(--u) * 1);
+}
+
+/* ---------- 開始畫面 ---------- */
+/* 封面圖填滿整個螢幕（換封面就改 url 裡的檔名），右下角稍微壓暗，按鈕和小字才看得清楚 */
+#start {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: calc(var(--u) * 6);
+  padding-right: max(calc(var(--u) * 6), env(safe-area-inset-right, 0px));
+  padding-bottom: max(calc(var(--u) * 6), env(safe-area-inset-bottom, 0px));
+  background:
+    linear-gradient(to top left, var(--start-shade), transparent 45%),
+    url("img/000.jpg") center / cover no-repeat,
+    var(--night-deep);
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+#start.gone { opacity: 0; visibility: hidden; }
+.start-inner {
+  max-width: min(100%, calc(var(--u) * 60));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(var(--u) * 1.6);
+  text-align: right;
+}
+#start h2 {
+  margin: calc(var(--u) * 1) 0 0;
+  font-family: var(--font-story);
+  font-size: var(--fs-card);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--alert);
+  text-wrap: balance;
+}
+#start p { margin: 0; font-size: var(--fs-lead); line-height: 1.8; }
+#start .start-tip { color: var(--muted); font-size: var(--fs-small); }
+
+.pill {
+  align-self: flex-start;
+  padding: calc(var(--u) * 1.4) calc(var(--u) * 4.4);
+  border: none;
+  border-radius: 999px;
+  background: var(--lamp);
+  color: var(--lamp-ink);
+  font: inherit;
+  font-size: var(--fs-lead);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+}
+#card .pill { align-self: center; }
+/* 外框款的按鈕（從頭再玩、隱藏章節） */
+.pill.ghost {
+  background: transparent;
+  color: var(--lamp);
+  box-shadow: inset 0 0 0 1px var(--lamp);
+}
+.start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: calc(var(--u) * 1.6);
+}
+
+/* ---------- 系統畫面：戴上耳機、請橫放（黑底、白色細線） ---------- */
+.system-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  background: var(--void);
+  color: var(--system-ink);
+  text-align: center;
+}
+.system-screen p {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+}
+.system-screen .sub {
+  margin-top: -8px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.system-icon {
+  width: clamp(64px, 9vmin, 96px);
+  height: clamp(64px, 9vmin, 96px);
+  fill: none;
+  stroke: var(--system-ink);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 耳機提示：按下開始後淡入、停一下、淡出 */
+#notice {
+  z-index: 9;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.7s ease, visibility 0.7s;
+}
+#notice.show { opacity: 1; visibility: visible; }
+
+/* 請橫放：只在直式螢幕出現，蓋住所有東西 */
+#rotate { z-index: 40; display: none; }
+@media (max-aspect-ratio: 1/1) {
+  #rotate { display: flex; }
+  #fs-btn { display: none; }
+}
+@media (pointer: coarse), (hover: none) {
+  #rotate .sub { display: none; }
+}
+/* 手機圖示轉成橫的，再轉回來 */
+#rotate .turn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: turn 3s ease-in-out infinite;
+}
+#rotate .arrow { stroke: var(--muted); }
+
+/* ---------- 右上角的全螢幕按鈕 ---------- */
+#fs-btn {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+  z-index: 7;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--night-deep);
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+#fs-btn:hover, #fs-btn:focus-visible { opacity: 1; }
+
+/* ---------- 開發者面板、錯誤提示 ---------- */
+#dev {
+  position: fixed;
+  left: max(8px, env(safe-area-inset-left, 0px));
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 16px);
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--notify-bg);
+  color: var(--muted);
+  font-family: var(--font-code);
+  font-size: 11px;
+}
+#dev select, #dev button {
+  font: inherit;
+  color: var(--paper);
+  background: var(--chat-bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 6px;
+}
+#problems {
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: max(8px, env(safe-area-inset-left, 0px));
+  right: max(8px, env(safe-area-inset-right, 0px));
+  z-index: 30;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--alert-bg);
+  color: var(--alert);
+  font-size: 13px;
+  line-height: 1.6;
+}
+#problems ul { margin: 4px 0 8px; padding-left: 18px; }
+#problems button {
+  font: inherit;
+  color: var(--alert);
+  background: none;
+  border: 1px solid var(--alert);
+  border-radius: 6px;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+/* ---------- 動畫 ---------- */
+@keyframes pop {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+@keyframes pick {
+  50% { box-shadow: 0 0 0 2px var(--theirs), 0 0 0 4px var(--phone-ink), 0 0 0 calc(var(--u) * 1.4) #ffffffa6; }
+}
+@keyframes take {
+  50% { background: var(--mine); }
+}
+@keyframes linger {
+  0% { opacity: 0; }
+  30%, 100% { opacity: 1; }
+}
+@keyframes caret {
+  50% { opacity: 0; }
+}
+@keyframes turn {
+  0%, 20% { transform: rotate(0deg); }
+  45%, 75% { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+/* 第一次對焦到快要清楚，又糊掉一點，第二次才真的看清楚。
+ * 模糊時稍微放大，模糊的邊緣才不會露出來 */
+@keyframes refocus {
+  0%, 8% { filter: blur(calc(var(--u) * 2)); transform: scale(1.08); }
+  42%, 50% { filter: blur(calc(var(--u) * 0.1)); transform: scale(1); }
+  64% { filter: blur(calc(var(--u) * 1)); transform: scale(1.04); }
+  100% { filter: blur(0); transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
