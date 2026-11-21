@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap">
 <link rel="stylesheet" href="style.css">
+<!-- 封面圖寫在 style.css 裡，瀏覽器要讀完 CSS 才會開始下載；這裡先叫它下載，開始畫面才不會空一下 -->
+<link rel="preload" as="image" href="img/000.jpg" fetchpriority="high">
 </head>
 <body>
 <!-- APP START -->
@@ -17,7 +19,7 @@
     <figure id="scene">
       <!-- 運鏡（推近、拉遠、平移）動的是這一層 -->
       <div id="camera">
-        <div id="scene-ph" class="placeholder"></div>
+        <div id="scene-ph" class="placeholder" hidden></div>
         <img id="scene-img" alt="">
       </div>
     </figure>

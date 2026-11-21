@@ -283,6 +283,30 @@ async function showCaption(who, text) {
 // 插圖的檔案位置，例如 img/I01.jpg
 const imageUrl = (id) => `${STORY.imageFolder}/${id}.${STORY.imageType}`;
 
+// 打開網頁就先在背景下載所有插圖，換圖時才不用等網路
+// 照故事裡出現的順序，一次下載兩張，前面幾幕用到的圖最先好
+const preloaded = []; // 留著這些 Image，瀏覽器才會把下載好的圖留在記憶體裡
+function preloadImages() {
+  const ids = [];
+  for (const scene of Object.values(STORY.scenes || {})) {
+    ids.push(scene.image);
+    for (const line of [...(scene.history || []), ...(scene.lines || [])]) {
+      if (line.type === "image" || line.type === "photo") ids.push(line.id);
+    }
+  }
+  const queue = [...new Set([...ids, ...Object.keys(STORY.images || {})])].filter(Boolean);
+  const next = () => {
+    const id = queue.shift();
+    if (!id) return;
+    const img = new Image();
+    img.onload = img.onerror = next;
+    img.src = imageUrl(id);
+    preloaded.push(img);
+  };
+  next();
+  next();
+}
+
 // 頭像：story.js 的 people 有設定就照設定，沒有就用名字的第一個字
 function avatar(name) {
   const person = STORY.people?.[name] || {};
@@ -334,14 +358,16 @@ function renderMsg(line, kind, time) {
 }
 
 // 照片：用 images 清單裡的插圖；圖檔還沒放時，顯示編號和說明
+// （還在下載時只是一塊底色，確定載不到才顯示說明，不然放上網路後會先閃過說明）
 function renderPhoto(line, time) {
   const caption = STORY.images[line.id] || "";
   const photo = el("figure", "photo");
   const img = el("img");
   img.alt = caption;
   img.onload = () => photo.classList.add("loaded");
+  img.onerror = () => photo.prepend(el("b", "", line.id), el("span", "", caption));
   img.src = imageUrl(line.id);
-  photo.append(el("b", "", line.id), el("span", "", caption), img);
+  photo.append(img);
   return addMsg(line.from, photo, line.read, time);
 }
 
@@ -431,6 +457,7 @@ function openChat(name) {
 let imageReady = Promise.resolve(); // 現在這張插圖載入好了沒（fadeIn 會先等它）
 
 // 換插圖；圖檔還沒放進資料夾時，顯示灰框和說明
+// （還在下載時只露出底色，確定載不到才顯示灰框，不然放上網路後會先閃過說明）
 // 回傳的 Promise 會在新圖載入好（或確定載不到）時完成
 // framing 是 image 那一行寫的 zoom、x、y：新的插圖一出來就是那個畫面（沒寫就是整張圖）
 function showImage(id, framing) {
@@ -438,7 +465,7 @@ function showImage(id, framing) {
   state.image = id;
   resetCamera(framing); // 換了插圖就是新的畫面，鏡頭不沿用上一張
   const caption = STORY.images[id] || "（images 清單裡還沒寫這張圖的說明）";
-  ui.scenePh.replaceChildren(el("b", "", id), el("span", "", caption));
+  ui.scenePh.hidden = true;
   ui.scene.classList.remove("refocus");
   ui.sceneImg.classList.remove("loaded");
   ui.sceneImg.alt = caption;
@@ -449,6 +476,8 @@ function showImage(id, framing) {
     };
     ui.sceneImg.onerror = () => {
       ui.sceneImg.classList.remove("loaded");
+      ui.scenePh.replaceChildren(el("b", "", id), el("span", "", caption));
+      ui.scenePh.hidden = false;
       resolve();
     };
     ui.sceneImg.src = imageUrl(id);
@@ -1520,6 +1549,7 @@ function boot() {
   }
   document.title = STORY.title;
   reportProblems(checkStory());
+  preloadImages();
   refreshStart();
   if (DEV) setupDev();
   // 頁面開著時才在網址後面加 #dev，也能打開面板
